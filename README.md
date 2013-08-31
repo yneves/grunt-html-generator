@@ -35,4 +35,4 @@ grunt.initConfig({
 })
 ```
 
-Above code create a file named "output.html" with the content of "./html/html-main-file.html" after replacing "{html-other-files}" with respective content. It's recursive, so be careful.
+The above code create a file named "output.html" with the content of "./html/html-main-file.html" after replacing "{html-other-files}" with respective content. It's recursive, so be careful.
