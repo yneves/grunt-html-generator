@@ -24,7 +24,7 @@ In your project's Gruntfile, add a section named `html-generator` to the data ob
 
 ```js
 grunt.initConfig({
- " html-generator": {
+ "html-generator": {
     target: {
       path: "./html",
       files: {
