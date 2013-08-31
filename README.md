@@ -28,9 +28,11 @@ grunt.initConfig({
     target: {
       path: "./html",
       files: {
-	"./output": "html-main-file"
+        "./output.html": "html-main-file"
       }
     },
   },
 })
 ```
+
+Above code create a file named "output.html" with the content of "./html/html-main-file.html" after replacing "{html-other-files}" with respective content. It's recursive, so be careful.
