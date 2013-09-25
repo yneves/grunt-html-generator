@@ -27,15 +27,13 @@ grunt.initConfig({
   "html-generator": {
     options: {
       root: ".",
-      html: "html",
-      js: "js",
-      css: "css"
+      html: "html"
     },
     target: {
       files: {
         "./output-file.html": {
-          js: [ "lib/*.js", "*.js" ],
-          css: "*.css",
+          js: [ "js/lib/*.js", "js/*.js" ],
+          css: "css/css/*.css",
           title: "<% pkg.name %>",
           head: "head",
           body: "body"

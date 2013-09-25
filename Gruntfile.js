@@ -35,8 +35,8 @@ module.exports = function(grunt) {
 			site: {
 				files: {
 					"www/index.html": {
-						js		: ["lib/*.js","*.js"],
-						css		: "*.css",
+						js		: ["js/lib/*.js","js/*.js"],
+						css		: "css/*.css",
 						title	: "<%= pkg.name %>",
 						head	: "head",
 						body	: "body"

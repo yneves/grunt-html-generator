@@ -111,12 +111,8 @@ module.exports = function(grunt) {
 		return content;
 	}
 
-	function files(params,type) {
-		var list = grunt.file.expand({ cwd: path.root+"/"+path[type] }, params[type]);
-		for (var l = 0; l < list.length; l++) {
-			list[l] = path[type]+"/"+list[l];
-		}
-		return list;
+	function files(match) {
+		return grunt.file.expand({ cwd: path.root }, match);
 	}
 
 	function html(params) {
@@ -132,7 +128,7 @@ module.exports = function(grunt) {
 		}
 
 		if (params.css) {
-			files(params,"css").forEach(function(href) {
+			files(params.css).forEach(function(href) {
 				head.push(tag("link",{
 					type: "text/css",
 					rel: "stylesheet",
@@ -142,7 +138,7 @@ module.exports = function(grunt) {
 		}
 
 		if (params.js) {
-			files(params,"js").forEach(function(src) {
+			files(params.js).forEach(function(src) {
 				head.push(tag("script",{
 					type: "text/javascript",
 					src: src
@@ -178,9 +174,7 @@ module.exports = function(grunt) {
 
 		var options = this.options({
 			root: ".",
-			html: "html",
-			js: "js",
-			css: "css"
+			html: "html"
 		});
 
 		path = options;
