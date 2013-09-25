@@ -36,7 +36,7 @@ grunt.initConfig({
         "./output-file.html": {
           js: [ "lib/*.js", "*.js" ],
           css: "*.css",
-          title: "title",
+          title: "<% pkg.name %>",
           head: "head",
           body: "body"
         },
@@ -46,4 +46,26 @@ grunt.initConfig({
 })
 ```
 
-The above code create a html document named "output-file.html".
+The above code create a html document named "output-file.html" with the content bellow.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+	<title>grunt-html-generator</title>
+	<!-- ./www/html/head.html -->
+	<link type="text/css" rel="stylesheet" href="css/a.css" />
+	<link type="text/css" rel="stylesheet" href="css/b.css" />
+	<link type="text/css" rel="stylesheet" href="css/c.css" />
+	<script type="text/javascript" src="js/lib/a.js" />
+	<script type="text/javascript" src="js/lib/b.js" />
+	<script type="text/javascript" src="js/lib/c.js" />
+	<script type="text/javascript" src="js/a.js" />
+	<script type="text/javascript" src="js/b.js" />
+	<script type="text/javascript" src="js/c.js" />
+</head>
+<body>
+	<h1>./www/html/body.html</h1>
+</body>
+</html>
+```
