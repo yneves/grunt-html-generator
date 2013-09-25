@@ -156,15 +156,15 @@ module.exports = function(grunt) {
 			doc.push(recurse(params.html));
 		} else {
 			doc = [
-				"<!DOCTYPE html>",
-				"<html>",
-					"<head>", "\t"+head.join("\n\t"), "</head>",
-					"<body>", "\t"+body.join("\n\t"), "</body>",
+				"<!DOCTYPE html>\n",
+				"<html>\n",
+				"<head>\n\t", head.join("\n\t"), "\n</head>\n",
+				"<body>\n\t", body.join("\n\t"), "\n</body>\n",
 				"</html>"
 			];
 		}
 
-		return entity(doc.join("\n"));
+		return entity(doc.join(""));
 	}
 
 	// - -------------------------------------------------------------------- - //
