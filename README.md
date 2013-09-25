@@ -39,7 +39,7 @@ grunt.initConfig({
           title: "title",
           head: "head",
           body: "body"
-	}
+        }
       }
     },
   },
