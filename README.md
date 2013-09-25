@@ -24,15 +24,26 @@ In your project's Gruntfile, add a section named `html-generator` to the data ob
 
 ```js
 grunt.initConfig({
- "html-generator": {
+  "html-generator": {
+    options: {
+      root: ".",
+      html: "html",
+      js: "js",
+      css: "css"
+    },
     target: {
-      path: "./html",
       files: {
-        "./output.html": "html-main-file"
+        "./output-file.html": {
+          js: [ "lib/*.js", "*.js" ],
+          css: "*.css",
+          title: "title",
+          head: "head",
+          body: "body"
+	}
       }
     },
   },
 })
 ```
 
-The above code create a file named "output.html" with the content of "./html/html-main-file.html" after replacing "{html-other-files}" with respective content. It's recursive, so be careful.
+The above code create a html document named "output-file.html".

@@ -1,0 +1,57 @@
+/* --------------------------------------------------- */
+/* - Colors - */
+
+.red {		background-color: #BF1E4B; color: white; }
+.gray {		background-color: #555555; color: white; }
+.blue {		background-color: #2E8DEF; color: white; }
+.green {	background-color: #00A600; color: white; }
+.black {	background-color: #222222; color: white; }
+.orange {	background-color: #DC572E; color: white; }
+.white {	background-color: white; color: #222222; }
+
+/* --------------------------------------------------- */
+/* - Stripe - */
+
+.stripe {
+	text-align: center;
+	clear: both;
+}
+
+.stripe .center {
+	max-width: 1000px;
+	margin: auto;
+	text-align: left;
+	clear: both;
+}
+
+.stripe .clear {
+	clear: both;
+	height: 0px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* --------------------------------------------------- */
+/* - Sizes - */
+
+.stripe .full {
+	width: 100%;
+	clear: both;
+}
+
+.stripe .half {
+	float: left;
+	width: 50%;
+}
+
+.stripe .third {
+	float: left;
+	width: 33.33%;
+}
+
+.stripe .quarter {
+	float: left;
+	width: 25%;
+}
+
+/* --------------------------------------------------- */

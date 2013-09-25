@@ -1,4 +1,5 @@
 {
+  "laxbreak": true,
   "curly": true,
   "eqeqeq": true,
   "immed": true,
@@ -9,6 +10,5 @@
   "undef": true,
   "boss": true,
   "eqnull": true,
-  "node": true,
-  "es5": true
+  "node": true
 }
