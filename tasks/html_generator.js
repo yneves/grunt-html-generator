@@ -105,7 +105,11 @@ module.exports = function(grunt) {
 		}
 		if (value) {
 			content += ">"+value+"</"+name+">";
-		} else {
+		}
+		else if (name === 'script'){
+		  content += "></"+name+">";
+		}
+		else {
 			content += " />";
 		}
 		return content;
