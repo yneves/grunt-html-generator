@@ -13,182 +13,182 @@
 
 module.exports = function(grunt) {
 
-	// - -------------------------------------------------------------------- - //
-	// - Stuff
+  // - -------------------------------------------------------------------- - //
+  // - Stuff
 
-	var path = {};
+  var path = {};
 
-	function template(content) {
-		if (content.indexOf("<%") > -1) {
-			return grunt.template.process(content);
-		} else {
-			return content;
-		}
-	}
+  function template(content) {
+    if (content.indexOf("<%") > -1) {
+      return grunt.template.process(content);
+    } else {
+      return content;
+    }
+  }
 
-	function replace() {
+  function replace() {
 
-		var args = arguments,
-			file = path.root+"/"+path.html+"/"+args[0]+".html",
-			content = grunt.file.exists(file) 
-				? grunt.file.read(file,"utf8") 
-				: template(args[0]);
+    var args = arguments,
+      file = path.root+"/"+path.html+"/"+args[0]+".html",
+      content = grunt.file.exists(file) 
+        ? grunt.file.read(file,"utf8") 
+        : template(args[0]);
 
-		if (args.length === 3) {
+    if (args.length === 3) {
 
-			content = content.replace(
-				new RegExp("{"+args[1]+"}","g"),
-				args[2]
-			);
+      content = content.replace(
+        new RegExp("{"+args[1]+"}","g"),
+        args[2]
+      );
 
-		} else if (args.length === 2) {
+    } else if (args.length === 2) {
 
-			if (typeof args[1] === "function") {
-				content = content.replace(/{[a-z\-]+}/g,function(name) {
-					name = name.replace(/^{|}$/g,"");
-					return args[1].apply(this,[name]);
-				});
+      if (typeof args[1] === "function") {
+        content = content.replace(/{[a-z\-]+}/g,function(name) {
+          name = name.replace(/^{|}$/g,"");
+          return args[1].apply(this,[name]);
+        });
 
-			} else if (typeof args[1] === "object") {
-				content = content.replace(/{[a-z\-]+}/g,function(name) {
-					name = name.replace(/^{|}$/g,"");
-					return args[1][name] || "";
-				});
+      } else if (typeof args[1] === "object") {
+        content = content.replace(/{[a-z\-]+}/g,function(name) {
+          name = name.replace(/^{|}$/g,"");
+          return args[1][name] || "";
+        });
 
-			}
+      }
 
-		}
+    }
 
-		return content;
-	}
+    return content;
+  }
 
-	function recurse(config) {
-		var parts = [];
-		if (typeof config === "string") {
-			parts.push( replace(config,recurse) );
-		} else if (config instanceof Array) {
-			for (var c = 0; c < config.length; c++) {
-				parts.push( recurse(config[c]) );
-			}
-		} else if (typeof config === "object") {
-			for (var part in config) {
-				parts.push( replace(part,config[part]) );
-			}
-		}
-		return parts.join("");
-	}
+  function recurse(config) {
+    var parts = [];
+    if (typeof config === "string") {
+      parts.push( replace(config,recurse) );
+    } else if (config instanceof Array) {
+      for (var c = 0; c < config.length; c++) {
+        parts.push( recurse(config[c]) );
+      }
+    } else if (typeof config === "object") {
+      for (var part in config) {
+        parts.push( replace(part,config[part]) );
+      }
+    }
+    return parts.join("");
+  }
 
-	function entity(content) {
-		var map = {
-			"º": "&deg;",		"ã": "&atilde;",	"õ": "&otilde;",
-			"Ã": "&Atilde;",	"Õ": "&Otilde;",	"â": "&acirc;",
-			"ê": "&ecirc;",		"î": "&icirc;",		"ô": "&ocirc;",
-			"û": "&ucirc;",		"Â": "&Acirc;",		"Ê": "&Ecirc;",
-			"Î": "&Icirc;",		"Ô": "&Ocirc;",		"Û": "&Ucirc;",
-			"á": "&aacute;",	"é": "&eacute;",	"í": "&iacute;",
-			"ó": "&oacute;",	"ú": "&uacute;",	"Á": "&Aacute;",
-			"É": "&Eacute;",	"Í": "&Iacute;",	"Ó": "&Oacute;",
-			"Ú": "&Uacute;",	"ç": "&ccedil;",	"Ç": "&Ccedil;",
-		};
-		for (var key in map) {
-			content = content.replace(new RegExp(key,"g"),map[key]);
-		}
-		return content;
-	}
+  function entity(content) {
+    var map = {
+      "º": "&deg;",    "ã": "&atilde;",  "õ": "&otilde;",
+      "Ã": "&Atilde;",  "Õ": "&Otilde;",  "â": "&acirc;",
+      "ê": "&ecirc;",    "î": "&icirc;",    "ô": "&ocirc;",
+      "û": "&ucirc;",    "Â": "&Acirc;",    "Ê": "&Ecirc;",
+      "Î": "&Icirc;",    "Ô": "&Ocirc;",    "Û": "&Ucirc;",
+      "á": "&aacute;",  "é": "&eacute;",  "í": "&iacute;",
+      "ó": "&oacute;",  "ú": "&uacute;",  "Á": "&Aacute;",
+      "É": "&Eacute;",  "Í": "&Iacute;",  "Ó": "&Oacute;",
+      "Ú": "&Uacute;",  "ç": "&ccedil;",  "Ç": "&Ccedil;",
+    };
+    for (var key in map) {
+      content = content.replace(new RegExp(key,"g"),map[key]);
+    }
+    return content;
+  }
 
-	function tag(name,props,value) {
-		var content = "<"+name;
-		if (props) {
-			for (var prop in props) {
-				content += " "+prop+"=\""+props[prop]+"\"";
-			}
-		}
-		if (value) {
-			content += ">"+value+"</"+name+">";
-		}
-		else if (name === 'script'){
-		  content += "></"+name+">";
-		}
-		else {
-			content += " />";
-		}
-		return content;
-	}
+  function tag(name,props,value) {
+    var content = "<"+name;
+    if (props) {
+      for (var prop in props) {
+        content += " "+prop+"=\""+props[prop]+"\"";
+      }
+    }
+    if (value) {
+      content += ">"+value+"</"+name+">";
+    }
+    else if (name === 'script'){
+      content += "></"+name+">";
+    }
+    else {
+      content += " />";
+    }
+    return content;
+  }
 
-	function files(match) {
-		return grunt.file.expand({ cwd: path.root }, match);
-	}
+  function files(match) {
+    return grunt.file.expand({ cwd: path.root }, match);
+  }
 
-	function html(params) {
+  function html(params) {
 
-		var head = [];
+    var head = [];
 
-		if (params.title) {
-			head.push(tag("title",null,recurse(params.title)));
-		}
+    if (params.title) {
+      head.push(tag("title",null,recurse(params.title)));
+    }
 
-		if (params.head) {
-			head.push(recurse(params.head));
-		}
+    if (params.head) {
+      head.push(recurse(params.head));
+    }
 
-		if (params.css) {
-			files(params.css).forEach(function(href) {
-				head.push(tag("link",{
-					type: "text/css",
-					rel: "stylesheet",
-					href: href
-				}));
-			});
-		}
+    if (params.css) {
+      files(params.css).forEach(function(href) {
+        head.push(tag("link",{
+          type: "text/css",
+          rel: "stylesheet",
+          href: href
+        }));
+      });
+    }
 
-		if (params.js) {
-			files(params.js).forEach(function(src) {
-				head.push(tag("script",{
-					type: "text/javascript",
-					src: src
-				}));
-			});
-		}
+    if (params.js) {
+      files(params.js).forEach(function(src) {
+        head.push(tag("script",{
+          type: "text/javascript",
+          src: src
+        }));
+      });
+    }
 
-		var body = [];
-		if (params.body) {
-			body.push(recurse(params.body));
-		}
+    var body = [];
+    if (params.body) {
+      body.push(recurse(params.body));
+    }
 
-		var doc = [];
-		if (params.html) {
-			doc.push(recurse(params.html));
-		} else {
-			doc = [
-				"<!DOCTYPE html>\n",
-				"<html>\n",
-				"<head>\n\t", head.join("\n\t"), "\n</head>\n",
-				"<body>\n\t", body.join("\n\t"), "\n</body>\n",
-				"</html>"
-			];
-		}
+    var doc = [];
+    if (params.html) {
+      doc.push(recurse(params.html));
+    } else {
+      doc = [
+        "<!DOCTYPE html>\n",
+        "<html>\n",
+        "<head>\n\t", head.join("\n\t"), "\n</head>\n",
+        "<body>\n\t", body.join("\n\t"), "\n</body>\n",
+        "</html>"
+      ];
+    }
 
-		return entity(doc.join(""));
-	}
+    return entity(doc.join(""));
+  }
 
-	// - -------------------------------------------------------------------- - //
-	// - Task
+  // - -------------------------------------------------------------------- - //
+  // - Task
 
-	grunt.registerMultiTask("html-generator","Grunt task to generate html files.",function() {
+  grunt.registerMultiTask("html-generator","Grunt task to generate html files.",function() {
 
-		var options = this.options({
-			root: ".",
-			html: "html"
-		});
+    var options = this.options({
+      root: ".",
+      html: "html"
+    });
 
-		path = options;
+    path = options;
 
-		var files = this.data.files;
-		for (var file in files) {
-			grunt.file.write(file,html(files[file]));
-			grunt.log.writeln('File "' + file + '" created.');
-		}
+    var files = this.data.files;
+    for (var file in files) {
+      grunt.file.write(file,html(files[file]));
+      grunt.log.writeln('File "' + file + '" created.');
+    }
 
-	});
+  });
 
 };
