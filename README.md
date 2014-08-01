@@ -27,7 +27,11 @@ grunt.initConfig({
   "html-generator": {
     options: {
       root: ".",
-      html: "html"
+      output: "index.html",
+      minify: false,
+      meta:[{
+        charset="utf-8"
+      }]
     },
     target: {
       files: {
@@ -35,8 +39,8 @@ grunt.initConfig({
           js: [ "js/lib/*.js", "js/*.js" ],
           css: "css/css/*.css",
           title: "<% pkg.name %>",
-          head: "head",
-          body: "body"
+          head  : ["html/head/*.html"],
+          body  : ["html/body/*.html"]
         },
       },
     },
@@ -49,21 +53,40 @@ The above code create a html document named "output-file.html" with the content 
 ```html
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>grunt-html-generator</title>
-	<!-- ./www/html/head.html -->
-	<link type="text/css" rel="stylesheet" href="css/a.css" />
-	<link type="text/css" rel="stylesheet" href="css/b.css" />
-	<link type="text/css" rel="stylesheet" href="css/c.css" />
-	<script type="text/javascript" src="js/lib/a.js" />
-	<script type="text/javascript" src="js/lib/b.js" />
-	<script type="text/javascript" src="js/lib/c.js" />
-	<script type="text/javascript" src="js/a.js" />
-	<script type="text/javascript" src="js/b.js" />
-	<script type="text/javascript" src="js/c.js" />
+    <title>grunt-html-generator</title>
+    <meta charset="utf-8" />
+    <link type="text/css" rel="stylesheet" href="css/a.css" />
+    <link type="text/css" rel="stylesheet" href="css/b.css" />
+    <link type="text/css" rel="stylesheet" href="css/c.css" />
+    <script type="text/javascript" src="js/lib/a.js"></script>
+    <script type="text/javascript" src="js/lib/b.js"></script>
+    <script type="text/javascript" src="js/lib/c.js"></script>
+    <script type="text/javascript" src="js/a.js"></script>
+    <script type="text/javascript" src="js/b.js"></script>
+    <script type="text/javascript" src="js/c.js"></script>
+    <!-- ./www/html/head.html -->
+    <style>
+        html {
+            font-family: Arial, Verdana;
+            font-size: 16px;
+        }
+        body {
+            color: lightgray;
+            background-color: black;
+        }
+    </style>
+    <script>
+        console.log("Awesome");
+    </script>
 </head>
+
 <body>
-	<h1>./www/html/body.html</h1>
+    <h1>./www/html/body-1.html</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+        dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 </body>
+
 </html>
 ```

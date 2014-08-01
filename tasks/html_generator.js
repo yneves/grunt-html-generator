@@ -209,9 +209,8 @@ module.exports = function(grunt) {
   grunt.registerMultiTask("html-generator","Grunt task to generate html files.",function() {
     var options = this.options({
       root: ".",
-      html: "html",
       output: "index.html",
-      minify: true,
+      minify: false,
       meta:[]
     });
 
