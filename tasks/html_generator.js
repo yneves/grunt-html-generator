@@ -10,74 +10,36 @@
 
 // - -------------------------------------------------------------------- - //
 // - Exports
+var path = require('path');
 
 module.exports = function(grunt) {
-
+  
+  var _debug = grunt.log.debug;
+  
   // - -------------------------------------------------------------------- - //
   // - Stuff
 
-  var path = {};
-
-  function template(content) {
-    if (content.indexOf("<%") > -1) {
-      return grunt.template.process(content);
-    } else {
-      return content;
+  function isString(something){
+    return Object.prototype.toString.call( something ) === '[object String]';
+  }
+  
+  function isArray(something){
+    return Object.prototype.toString.call( something ) === '[object Array]';
+  }
+  
+  function isObject(something){
+    return Object.prototype.toString.call( something ) === '[object Object]';
+  }
+  
+  function isFile(something){
+    if(isString(something)){
+      return grunt.file.exists(something);
+    }
+    else{
+      return false;
     }
   }
-
-  function replace() {
-
-    var args = arguments,
-      file = path.root+"/"+path.html+"/"+args[0]+".html",
-      content = grunt.file.exists(file) 
-        ? grunt.file.read(file,"utf8") 
-        : template(args[0]);
-
-    if (args.length === 3) {
-
-      content = content.replace(
-        new RegExp("{"+args[1]+"}","g"),
-        args[2]
-      );
-
-    } else if (args.length === 2) {
-
-      if (typeof args[1] === "function") {
-        content = content.replace(/{[a-z\-]+}/g,function(name) {
-          name = name.replace(/^{|}$/g,"");
-          return args[1].apply(this,[name]);
-        });
-
-      } else if (typeof args[1] === "object") {
-        content = content.replace(/{[a-z\-]+}/g,function(name) {
-          name = name.replace(/^{|}$/g,"");
-          return args[1][name] || "";
-        });
-
-      }
-
-    }
-
-    return content;
-  }
-
-  function recurse(config) {
-    var parts = [];
-    if (typeof config === "string") {
-      parts.push( replace(config,recurse) );
-    } else if (config instanceof Array) {
-      for (var c = 0; c < config.length; c++) {
-        parts.push( recurse(config[c]) );
-      }
-    } else if (typeof config === "object") {
-      for (var part in config) {
-        parts.push( replace(part,config[part]) );
-      }
-    }
-    return parts.join("");
-  }
-
+  
   function entity(content) {
     var map = {
       "º": "&deg;",    "ã": "&atilde;",  "õ": "&otilde;",
@@ -115,24 +77,26 @@ module.exports = function(grunt) {
     return content;
   }
 
-  function files(match) {
-    return grunt.file.expand({ cwd: path.root }, match);
-  }
-
-  function html(params) {
-
+  function html(params){
+    //Create head
     var head = [];
 
-    if (params.title) {
-      head.push(tag("title",null,recurse(params.title)));
+    if (params.title) { //String or Array
+      _debug("Head -> title",params.title);
+      var title = isString(params.title) ? params.title : params.title.join(" ");
+      head.push(tag("title",null,title));
     }
-
-    if (params.head) {
-      head.push(recurse(params.head));
+    
+    if(params.meta){
+      _debug("Head -> META",params.meta);
+      params.meta.forEach(function(metaAttributes) {
+        head.push(tag("meta",metaAttributes));
+      });
     }
-
-    if (params.css) {
-      files(params.css).forEach(function(href) {
+    
+    if (params.css) { //File or String or Array of Files or Strings
+      _debug("Head -> CSS",params.css);
+      params.css.forEach(function(href) {
         head.push(tag("link",{
           type: "text/css",
           rel: "stylesheet",
@@ -141,8 +105,9 @@ module.exports = function(grunt) {
       });
     }
 
-    if (params.js) {
-      files(params.js).forEach(function(src) {
+    if (params.js) { //File or String or Array of Files or Strings
+      _debug("Head -> JS",params.js);
+      params.js.forEach(function(src) {
         head.push(tag("script",{
           type: "text/javascript",
           src: src
@@ -150,14 +115,24 @@ module.exports = function(grunt) {
       });
     }
 
-    var body = [];
-    if (params.body) {
-      body.push(recurse(params.body));
+    if (params.head) { //File or String or Array of Files or Strings
+      _debug("Head -> head",params.head);
+      head = head.concat(params.head);
+      _debug("Now Head -> head",params.head);
     }
-
+    
+    //Create Body
+    var body = [];
+    if (params.body) { //File or String or Array of Files or Strings
+      _debug("BODY",params.body);
+      body = body.concat(params.body);
+    }
+    
+    //Create Doc
     var doc = [];
     if (params.html) {
-      doc.push(recurse(params.html));
+      _debug("DOC",params.html);
+      ///doc.push(recurse(params.html));
     } else {
       doc = [
         "<!DOCTYPE html>\n",
@@ -167,27 +142,117 @@ module.exports = function(grunt) {
         "</html>"
       ];
     }
-
-    return entity(doc.join(""));
+    var output = entity(doc.join(""));
+    
+    if(params.minify===true){ //if minify
+      var minifyCfg = {
+        removeComments:true, 
+        minifyJS:true, 
+        minifyCSS:true, 
+        collapseWhitespace:true,
+        conservativeCollapse:true
+      };
+      var minify = require('html-minifier').minify;
+      output = minify(output,minifyCfg);
+    }
+    else{ //else beautify
+      var beautify_js = require('js-beautify');
+      output = beautify_js.html_beautify(output);
+    }
+    
+    return output;
   }
-
+  
+  /**
+   * Expand file, by converting in an array of strings
+   * @param file Object as returned by task.files
+   * @param root String root directory where paths refer to
+   * @return Array of strings
+   */
+  function expand(file, root){
+    var items = file.orig.src;
+    var category = file.dest;
+    _debug("Expanding "+category+": ",items,"\n");
+    var expanded;
+    switch(category){
+      case 'meta': //bypass expanding that would break
+        expanded = items;
+        break;
+      case 'head':
+      case 'body':
+        //expand + retrieve file content
+        expanded = grunt.file.expand({cwd:root,nonull:true},items);
+        expanded = expanded.map(function(item){
+          var filePath = path.join(root,item);
+          if(isFile(filePath)){
+            return grunt.file.read(filePath,{encoding:'utf8'});
+          }
+          else{
+            _debug("File ",filePath," does not exist");
+            return item;
+          }
+        });
+        break;
+      default:
+        //expand
+        expanded = grunt.file.expand({cwd:root,nonull:true},items);
+        break;
+    }
+    
+    _debug("Expanded "+category+": ",expanded,"\n");
+    return expanded;
+  }
+  
   // - -------------------------------------------------------------------- - //
   // - Task
-
+  
   grunt.registerMultiTask("html-generator","Grunt task to generate html files.",function() {
-
     var options = this.options({
       root: ".",
-      html: "html"
+      html: "html",
+      output: "index.html",
+      minify: true,
+      meta:[]
     });
 
-    path = options;
+    //A fake file object, because file won't accept an array of objects
+    var metaFileObject = {
+      dest:'meta',
+      orig:{
+        src:options.meta,
+        dest:'meta'
+      }
+    };
+    
+    var files = this.files;
+    files.push(metaFileObject);
+    _debug("OPTIONS",options);
+    _debug("FILES",files,"\n\n");
+    
+    var output =path.join(options.root,options.output);
+    var config = {
+      minify: options.minify
+    };
+    
+    (function(config){
+      var count = files.length;
+      files.forEach(function(file) {
+        var src = file.orig.src;
+        var dest = file.dest;       
+        var htmlItems = expand(file, options.root);
+        
+        if(htmlItems.length === 0){
+          htmlItems = src; //it's not an array of real files - should never happen
+        }
 
-    var files = this.data.files;
-    for (var file in files) {
-      grunt.file.write(file,html(files[file]));
-      grunt.log.writeln('File "' + file + '" created.');
-    }
+        config[file.dest]=htmlItems;
+        count--;
+        if(count === 0){
+            grunt.file.write(output,html(config));
+            grunt.log.writeln('File "' + output + '" created.');
+        }
+      });
+    })(config);
 
   });
 

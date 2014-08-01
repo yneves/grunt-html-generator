@@ -34,5 +34,9 @@
   },
   "keywords": [
     "gruntplugin"
-  ]
+  ],
+  "dependencies": {
+    "html-minifier": "^0.6.6",
+    "js-beautify": "^1.5.1"
+  }
 }
