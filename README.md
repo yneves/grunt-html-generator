@@ -27,7 +27,7 @@ grunt.initConfig({
   "html-generator": {
     options: {
       root: ".",
-      output: "index.html",
+      output: "output-file.html",
       minify: false,
       meta:[{
         charset="utf-8"
@@ -35,20 +35,18 @@ grunt.initConfig({
     },
     target: {
       files: {
-        "./output-file.html": {
-          js: [ "js/lib/*.js", "js/*.js" ],
-          css: "css/css/*.css",
-          title: "<% pkg.name %>",
-          head  : ["html/head/*.html"],
-          body  : ["html/body/*.html"]
-        },
+        js: ['js/lib/*.js','js/*.js'],
+        css : "css/*.css",
+        title : "<%= pkg.name %>", //shouldn't title be in options?
+        head  : ["html/head/*.html"],
+        body  : ["html/body/*.html"]
       },
     },
   },
 })
 ```
 
-The above code create a html document named "output-file.html" with the content bellow.
+The above code create a html document named "output-file.html" with the content bellow. See Gruntfile.js.
 
 ```html
 <!DOCTYPE html>
